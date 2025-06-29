@@ -1,64 +1,130 @@
-const ticketForm = document.getElementById('ticketForm');
-const ticketList = document.getElementById('ticketList');
-const searchInput = document.getElementById('searchInput');
+document.addEventListener("DOMContentLoaded", () => {
+  const ticketForm = document.getElementById("ticketForm");
+  const ticketList = document.getElementById("ticketList");
 
-const API_URL = 'http://127.0.0.1:5000';
+  const myTicketForm = document.getElementById("myTicketForm");
+  const myTicketList = document.getElementById("myTicketList");
 
-async function fetchTickets(filter = '') {
-  try {
-    const res = await fetch(`${API_URL}/tickets`);
-    const tickets = await res.json();
+  // 🔁 Load All Tickets
+  async function fetchTickets() {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/tickets");
+      const tickets = await response.json();
 
-    ticketList.innerHTML = '';
+      ticketList.innerHTML = "";
 
-    tickets
-      .filter(ticket =>
-        ticket.name.toLowerCase().includes(filter.toLowerCase()) ||
-        ticket.issue.toLowerCase().includes(filter.toLowerCase())
-      )
-      .forEach(ticket => {
-        const ticketCard = document.createElement('div');
-        ticketCard.className = 'ticket';
-        ticketCard.innerHTML = `
-          <h3>${ticket.name} <span class="status ${ticket.status}">${ticket.status}</span></h3>
+      if (tickets.length === 0) {
+        ticketList.innerHTML = "<p>No tickets submitted yet.</p>";
+        return;
+      }
+
+      tickets.forEach((ticket) => {
+        const ticketEl = document.createElement("div");
+        ticketEl.className = "ticket";
+        ticketEl.innerHTML = `
+          <p><strong>Name:</strong> ${ticket.name}</p>
           <p><strong>Email:</strong> ${ticket.email}</p>
           <p><strong>Issue:</strong> ${ticket.issue}</p>
+          <p><strong>Category:</strong> ${ticket.category}</p>
           <p><strong>Priority:</strong> ${ticket.priority}</p>
-          <button onclick="toggleStatus('${ticket.id}')">Mark as ${ticket.status === 'Open' ? 'Closed' : 'Open'}</button>
+          <p><strong>Status:</strong> ${ticket.status}</p>
+          <button onclick="toggleStatus('${ticket.id}')">
+            Mark as ${ticket.status === "Open" ? "Closed" : "Open"}
+          </button>
         `;
-        ticketList.appendChild(ticketCard);
+        ticketList.appendChild(ticketEl);
       });
-  } catch (err) {
-    console.error("Failed to fetch tickets:", err);
+    } catch (err) {
+      console.error("Failed to fetch tickets:", err);
+      ticketList.innerHTML = "<p>Error loading tickets.</p>";
+    }
   }
-}
 
-async function toggleStatus(id) {
-  await fetch(`${API_URL}/toggle-status/${id}`, { method: 'POST' });
-  fetchTickets(searchInput.value);
-}
+  // 📨 Submit New Ticket
+  ticketForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-ticketForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const issue = document.getElementById("issue").value.trim();
+    const category = document.getElementById("category").value;
+    const priority = document.getElementById("priority").value;
 
-  const newTicket = {
-    name: document.getElementById('name').value,
-    email: document.getElementById('email').value,
-    issue: document.getElementById('issue').value,
-    priority: document.getElementById('priority').value
-  };
+    if (!name || !email || !issue || !category || !priority) {
+      alert("Please fill in all fields.");
+      return;
+    }
 
-  await fetch(`${API_URL}/submit-ticket`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(newTicket)
+    try {
+      const response = await fetch("http://127.0.0.1:5000/submit-ticket", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, issue, category, priority })
+      });
+
+      if (!response.ok) throw new Error("Failed to submit ticket");
+
+      alert("Ticket submitted successfully!");
+      ticketForm.reset();
+      fetchTickets();
+    } catch (err) {
+      console.error("Submission error:", err);
+      alert("Something went wrong. Try again.");
+    }
   });
 
-  ticketForm.reset();
-  fetchTickets();
+  // 🔁 Toggle Ticket Status
+  window.toggleStatus = async function (ticketId) {
+    try {
+      await fetch(`http://127.0.0.1:5000/toggle-status/${ticketId}`, {
+        method: "POST"
+      });
+      fetchTickets();
+    } catch (err) {
+      console.error("Failed to update status:", err);
+    }
+  };
+
+  // 🔍 View My Tickets
+  myTicketForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("myEmail").value.trim();
+    if (!email) {
+      alert("Please enter your email");
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/my-tickets?email=${encodeURIComponent(email)}`);
+      if (!response.ok) throw new Error("Failed to load your tickets");
+
+      const tickets = await response.json();
+      myTicketList.innerHTML = "";
+
+      if (tickets.length === 0) {
+        myTicketList.innerHTML = "<p>No tickets found for this email.</p>";
+        return;
+      }
+
+      tickets.forEach((ticket) => {
+        const ticketEl = document.createElement("div");
+        ticketEl.className = "ticket";
+        ticketEl.innerHTML = `
+          <p><strong>Name:</strong> ${ticket.name}</p>
+          <p><strong>Email:</strong> ${ticket.email}</p>
+          <p><strong>Issue:</strong> ${ticket.issue}</p>
+          <p><strong>Category:</strong> ${ticket.category}</p>
+          <p><strong>Priority:</strong> ${ticket.priority}</p>
+          <p><strong>Status:</strong> ${ticket.status}</p>
+        `;
+        myTicketList.appendChild(ticketEl);
+      });
+    } catch (err) {
+      console.error("Error loading your tickets:", err);
+      myTicketList.innerHTML = "<p>Error loading your tickets.</p>";
+    }
+  });
+
+  fetchTickets(); // Initial fetch
 });
-
-searchInput.addEventListener('input', () => fetchTickets(searchInput.value));
-
-// 🟢 Initial load
-fetchTickets();
