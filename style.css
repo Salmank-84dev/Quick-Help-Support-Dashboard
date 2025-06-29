@@ -1,0 +1,135 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  width: 90%;
+  max-width: 800px;
+  margin: 30px auto;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+form input,
+form textarea,
+form select {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+form button {
+  padding: 10px;
+  background-color: #0078D4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+form button:hover {
+  background-color: #005fa3;
+}
+
+#searchInput {
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 20px;
+  width: 100%;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+}
+
+.ticket {
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  background-color: #fafafa;
+}
+
+.ticket h3 {
+  margin: 0 0 10px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  color: white;
+}
+
+.status.Open {
+  background-color: green;
+}
+
+.status.Closed {
+  background-color: red;
+}
+
+.ticket button {
+  margin-top: 10px;
+  padding: 6px 12px;
+  border: none;
+  background-color: #ff8c00;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ticket button:hover {
+  background-color: #e67e00;
+}
+
+@media (max-width: 600px) {
+  .container {
+    width: 95%;
+    padding: 10px;
+  }
+
+  form {
+    gap: 8px;
+  }
+
+  form input,
+  form textarea,
+  form select,
+  #searchInput {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  form button,
+  .ticket button {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .ticket h3 {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+}

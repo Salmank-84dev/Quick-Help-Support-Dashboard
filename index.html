@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuickHelp Support Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>QuickHelp Support</h1>
+
+    <form id="ticketForm">
+      <input type="text" id="name" placeholder="Your Name" required />
+      <input type="email" id="email" placeholder="Your Email" required />
+      <textarea id="issue" placeholder="Describe your issue" required></textarea>
+      <select id="priority">
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
+      </select>
+      <button type="submit">Submit Ticket</button>
+    </form>
+
+    <input type="text" id="searchInput" placeholder="Search by name or issue" />
+
+    <div id="ticketList"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
